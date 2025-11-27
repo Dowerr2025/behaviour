@@ -3,35 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <title>Manage Points</title>
+
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input { width: 50px; text-align: center; }
-    button { margin: 10px; padding: 5px 15px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: url('children.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 40px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+    }
+
+    .form-container {
+      background: rgba(0,0,0,0.5);
+      padding: 20px;
+      border-radius: 12px;
+      width: 300px;
+      margin: 40px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #ffcc00;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #ffdb4d;
+    }
   </style>
 </head>
 <body>
-  <h1>Update Points</h1>
-  <form>
-    <label>Katie: <input type="number" id="katiePoints" value="10"></label><br><br>
-    <label>Lucy: <input type="number" id="lucyPoints" value="15"></label><br><br>
-    <label>Jessica: <input type="number" id="jessicaPoints" value="8"></label><br><br>
-    <button type="button" onclick="savePoints()">Save</button>
-  </form>
+  <h1>Manage Points</h1>
+
+  <div class="form-container">
+    <label for="katiePoints">Katie's Points:</label>
+    <input type="number" id="katiePoints" min="0">
+
+    <label for="lucyPoints">Lucy's Points:</label>
+    <input type="number" id="lucyPoints" min="0">
+
+    <label for="jessicaPoints">Jessica's Points:</label>
+    <input type="number" id="jessicaPoints" min="0">
+
+    <button onclick="savePoints()">Save Points</button>
+  </div>
 
   <script>
-  function savePoints() {
-    const katie = document.getElementById('katiePoints').value;
-    const lucy = document.getElementById('lucyPoints').value;
-    const jessica = document.getElementById('jessicaPoints').value;
+    // --- Firebase setup ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
+      authDomain: "rewards-21619.firebaseapp.com",
+      projectId: "rewards-21619",
+      storageBucket: "rewards-21619.firebasestorage.app",
+      messagingSenderId: "712989986916",
+      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
+      measurementId: "G-TBG30TN6EW"
+    };
 
-    // Save to localStorage
-    localStorage.setItem('katiePoints', katie);
-    localStorage.setItem('lucyPoints', lucy);
-    localStorage.setItem('jessicaPoints', jessica);
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    alert(`Points saved!\nKatie: ${katie}\nLucy: ${lucy}\nJessica: ${jessica}`);
-  }
-</script>
+    // Save points to Firebase
+    function savePoints() {
+      const katie = parseInt(document.getElementById('katiePoints').value || '0', 10);
+      const lucy = parseInt(document.getElementById('lucyPoints').value || '0', 10);
+      const jessica = parseInt(document.getElementById('jessicaPoints').value || '0', 10);
 
+      db.ref("points").set({
+        katie: katie,
+        lucy: lucy,
+        jessica: jessica
+      })
+      .then(() => {
+        alert("Points saved successfully!");
+      })
+      .catch(error => {
+        alert("Error saving points: " + error);
+      });
+    }
+
+    // Load current points into the form when page opens
+    db.ref("points").on("value", snapshot => {
+      const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
+      document.getElementById('katiePoints').value = data.katie;
+      document.getElementById('lucyPoints').value = data.lucy;
+      document.getElementById('jessicaPoints').value = data.jessica;
+    });
+  </script>
 </body>
 </html>
