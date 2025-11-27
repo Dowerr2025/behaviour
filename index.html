@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Good Behaviour Points</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('children.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      text-align: center;
+    }
+
+    .bar-container {
+      width: 80%;
+      background: rgba(0, 0, 0, 0.35);
+      margin: 20px auto;
+      border-radius: 12px;
+      padding: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .bar {
+      height: 40px;
+      line-height: 40px;
+      text-align: left;
+      padding-left: 10px;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      border-radius: 8px;
+      transition: width 0.8s ease-in-out;
+    }
+    .katie { background: #ff6f61; }
+    .lucy { background: #6fa8dc; }
+    .jessica { background: #93c47d; }
+
+    /* Trees and stars */
+    .trees {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 50px 0;
+    }
+    .tree-container {
+      text-align: center;
+      position: relative;
+      width: 150px;
+    }
+    .tree {
+      width: 150px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      z-index: 1;
+      position: relative;
+    }
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .star {
+      color: gold;
+      font-size: 24px;
+      position: absolute;
+      filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
+      opacity: 0;
+      transform: scale(0.6);
+      animation: pop 400ms ease forwards;
+    }
+    @keyframes pop {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Bigger names */
+    .tree-container p {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+
+    /* Wreath styling */
+    .wreath {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 50px;
+      height: 50px;
+      pointer-events: none;
+      z-index: 3;
+    }
+    h1 {
+      font-size: 48px;   /* bigger headline */
+      font-weight: bold;
+      margin-top: 20px;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.6); /* optional glow for readability */
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Good Behaviour Points for Christmas</h1>
+
+  <div class="bar-container">
+    <div class="bar katie" id="katieBar">Katie: 0</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar lucy" id="lucyBar">Lucy: 0</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar jessica" id="jessicaBar">Jessica: 0</div>
+  </div>
+
+  <div class="trees">
+    <div class="tree-container" id="katieTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="katieStars"></div>
+      <div class="wreath" id="katieWreath"></div>
+      <p>Katie</p>
+    </div>
+    <div class="tree-container" id="lucyTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="lucyStars"></div>
+      <div class="wreath" id="lucyWreath"></div>
+      <p>Lucy</p>
+    </div>
+    <div class="tree-container" id="jessicaTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="jessicaStars"></div>
+      <div class="wreath" id="jessicaWreath"></div>
+      <p>Jessica</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      updateBars();
+    });
+
+    function updateBars() {
+      const katie = parseInt(localStorage.getItem('katiePoints') || '0', 10);
+      const lucy = parseInt(localStorage.getItem('lucyPoints') || '0', 10);
+      const jessica = parseInt(localStorage.getItem('jessicaPoints') || '0', 10);
+
+      animateBar('katieBar', katie);
+      animateBar('lucyBar', lucy);
+      animateBar('jessicaBar', jessica);
+
+      updateStars('katieStars', katie);
+      updateStars('lucyStars', lucy);
+      updateStars('jessicaStars', jessica);
+
+      updateWreath('katieWreath', katie);
+      updateWreath('lucyWreath', lucy);
+      updateWreath('jessicaWreath', jessica);
+    }
+
+    function animateBar(barId, value) {
+      const bar = document.getElementById(barId);
+      const targetWidth = Math.min(value * 20, 800);
+      const name = barId.replace('Bar','');
+
+      bar.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + value;
+      bar.style.width = '0px';
+      setTimeout(() => { bar.style.width = targetWidth + 'px'; }, 80);
+    }
+
+    function updateStars(starContainerId, points) {
+      const container = document.getElementById(starContainerId);
+      if (!container) return;
+
+      container.innerHTML = '';
+      const starCount = Math.floor(points / 10);
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.textContent = '⭐';
+
+        const margin = 8;
+        const x = Math.random() * (150 - margin * 2) + margin;
+        const y = Math.random() * (150 - margin * 2) + margin;
+
+        star.style.left = x + 'px';
+        star.style.top = y + 'px';
+
+        container.appendChild(star);
+      }
+    }
+
+    function updateWreath(wreathId, points) {
+      const container = document.getElementById(wreathId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (points >= 50) {
+        const wreathImg = document.createElement('img');
+        wreathImg.src = 'wreath.png'; // add a wreath image file
+        wreathImg.alt = 'Golden Wreath';
+        wreathImg.style.width = '50px';
+        wreathImg.style.height = '50px';
+        container.appendChild(wreathImg);
+      }
+    }
+  </script>
+</body>
+</html>

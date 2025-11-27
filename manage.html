@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Points</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    input { width: 50px; text-align: center; }
+    button { margin: 10px; padding: 5px 15px; }
+  </style>
+</head>
+<body>
+  <h1>Update Points</h1>
+  <form>
+    <label>Katie: <input type="number" id="katiePoints" value="10"></label><br><br>
+    <label>Lucy: <input type="number" id="lucyPoints" value="15"></label><br><br>
+    <label>Jessica: <input type="number" id="jessicaPoints" value="8"></label><br><br>
+    <button type="button" onclick="savePoints()">Save</button>
+  </form>
+
+  <script>
+  function savePoints() {
+    const katie = document.getElementById('katiePoints').value;
+    const lucy = document.getElementById('lucyPoints').value;
+    const jessica = document.getElementById('jessicaPoints').value;
+
+    // Save to localStorage
+    localStorage.setItem('katiePoints', katie);
+    localStorage.setItem('lucyPoints', lucy);
+    localStorage.setItem('jessicaPoints', jessica);
+
+    alert(`Points saved!\nKatie: ${katie}\nLucy: ${lucy}\nJessica: ${jessica}`);
+  }
+</script>
+
+</body>
+</html>
