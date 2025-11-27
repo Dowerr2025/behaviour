@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Manage Points</title>
+  <title>Good Behaviour Points for Christmas</title>
 
   <!-- Firebase v9 modular scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
     // --- Firebase config with databaseURL added ---
     const firebaseConfig = {
@@ -24,104 +24,205 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Save points to Firebase
-    window.savePoints = function() {
-      const katie = parseInt(document.getElementById('katiePoints').value || '0', 10);
-      const lucy = parseInt(document.getElementById('lucyPoints').value || '0', 10);
-      const jessica = parseInt(document.getElementById('jessicaPoints').value || '0', 10);
-
-      set(ref(db, "points"), {
-        katie: katie,
-        lucy: lucy,
-        jessica: jessica
-      }).then(() => {
-        alert("Points saved successfully!");
-      }).catch(error => {
-        alert("Error saving points: " + error);
-      });
-    };
-
-    // Load current points into the form when page opens
+    // Listen for changes in points and update UI
     onValue(ref(db, "points"), snapshot => {
       const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
-      document.getElementById('katiePoints').value = data.katie;
-      document.getElementById('lucyPoints').value = data.lucy;
-      document.getElementById('jessicaPoints').value = data.jessica;
+
+      animateBar('katieBar', data.katie);
+      animateBar('lucyBar', data.lucy);
+      animateBar('jessicaBar', data.jessica);
+
+      updateStars('katieStars', data.katie);
+      updateStars('lucyStars', data.lucy);
+      updateStars('jessicaStars', data.jessica);
+
+      updateWreath('katieWreath', data.katie);
+      updateWreath('lucyWreath', data.lucy);
+      updateWreath('jessicaWreath', data.jessica);
     });
+
+    // --- Functions ---
+    function animateBar(barId, value) {
+      const bar = document.getElementById(barId);
+      const targetWidth = Math.min(value * 20, 800);
+      const name = barId.replace('Bar','');
+
+      bar.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + value;
+      bar.style.width = '0px';
+      setTimeout(() => { bar.style.width = targetWidth + 'px'; }, 80);
+    }
+
+    function updateStars(starContainerId, points) {
+      const container = document.getElementById(starContainerId);
+      if (!container) return;
+
+      container.innerHTML = '';
+      const starCount = Math.floor(points / 10);
+
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.textContent = '⭐';
+
+        const margin = 8;
+        const x = Math.random() * (150 - margin * 2) + margin;
+        const y = Math.random() * (150 - margin * 2) + margin;
+
+        star.style.left = x + 'px';
+        star.style.top = y + 'px';
+
+        container.appendChild(star);
+      }
+    }
+
+    function updateWreath(wreathId, points) {
+      const container = document.getElementById(wreathId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (points >= 50) {
+        const wreathImg = document.createElement('img');
+        wreathImg.src = 'wreath.png'; // make sure wreath.png is in the same folder
+        wreathImg.alt = 'Golden Wreath';
+        wreathImg.style.width = '170px';
+        wreathImg.style.height = '170px';
+        container.appendChild(wreathImg);
+      }
+    }
   </script>
 
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: url('children.jpg') no-repeat center center fixed;
       background-size: cover;
       color: white;
       text-align: center;
-      margin: 0;
-      padding: 20px;
     }
 
     h1 {
-      font-size: 40px;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-    }
-
-    .form-container {
-      background: rgba(0,0,0,0.5);
-      padding: 20px;
-      border-radius: 12px;
-      width: 300px;
-      margin: 40px auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
-
-    label {
-      display: block;
-      margin: 15px 0 5px;
+      font-size: 48px;
       font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      text-align: center;
-      font-size: 18px;
-    }
-
-    button {
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      background: #ffcc00;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
     }
 
-    button:hover {
-      background: #ffdb4d;
+    .bar-container {
+      width: 80%;
+      background: rgba(0, 0, 0, 0.35);
+      margin: 20px auto;
+      border-radius: 12px;
+      padding: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    .bar {
+      height: 40px;
+      line-height: 40px;
+      text-align: left;
+      padding-left: 10px;
+      color: #fff;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      border-radius: 8px;
+      transition: width 0.8s ease-in-out;
+    }
+    .katie { background: #ff6f61; }
+    .lucy { background: #6fa8dc; }
+    .jessica { background: #93c47d; }
+
+    .trees {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 50px 0;
+    }
+    .tree-container {
+      text-align: center;
+      position: relative;
+      width: 150px;
+    }
+    .tree {
+      width: 150px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      z-index: 1;
+      position: relative;
+    }
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .star {
+      color: gold;
+      font-size: 24px;
+      position: absolute;
+      filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
+      opacity: 0;
+      transform: scale(0.6);
+      animation: pop 400ms ease forwards;
+    }
+    @keyframes pop {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .tree-container p {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    }
+
+    .wreath {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 170px;
+      height: 170px;
+      pointer-events: none;
+      z-index: 3;
     }
   </style>
 </head>
 <body>
-  <h1>Manage Points</h1>
+  <h1>Good Behaviour Points for Christmas</h1>
 
-  <div class="form-container">
-    <label for="katiePoints">Katie's Points:</label>
-    <input type="number" id="katiePoints" min="0">
+  <div class="bar-container">
+    <div class="bar katie" id="katieBar">Katie: 0</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar lucy" id="lucyBar">Lucy: 0</div>
+  </div>
+  <div class="bar-container">
+    <div class="bar jessica" id="jessicaBar">Jessica: 0</div>
+  </div>
 
-    <label for="lucyPoints">Lucy's Points:</label>
-    <input type="number" id="lucyPoints" min="0">
-
-    <label for="jessicaPoints">Jessica's Points:</label>
-    <input type="number" id="jessicaPoints" min="0">
-
-    <button onclick="savePoints()">Save Points</button>
+  <div class="trees">
+    <div class="tree-container" id="katieTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="katieStars"></div>
+      <div class="wreath" id="katieWreath"></div>
+      <p>Katie</p>
+    </div>
+    <div class="tree-container" id="lucyTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="lucyStars"></div>
+      <div class="wreath" id="lucyWreath"></div>
+      <p>Lucy</p>
+    </div>
+    <div class="tree-container" id="jessicaTree">
+      <img src="tree.png" class="tree" alt="Christmas Tree">
+      <div class="stars" id="jessicaStars"></div>
+      <div class="wreath" id="jessicaWreath"></div>
+      <p>Jessica</p>
+    </div>
   </div>
 </body>
 </html>
