@@ -4,9 +4,51 @@
   <meta charset="UTF-8">
   <title>Manage Points</title>
 
-  <!-- Firebase scripts -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <!-- Firebase v9 modular scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+    // --- Firebase config with databaseURL added ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
+      authDomain: "rewards-21619.firebaseapp.com",
+      databaseURL: "https://rewards-21619-default-rtdb.firebaseio.com",  // <-- critical line
+      projectId: "rewards-21619",
+      storageBucket: "rewards-21619.firebasestorage.app",
+      messagingSenderId: "712989986916",
+      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
+      measurementId: "G-TBG30TN6EW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Save points to Firebase
+    window.savePoints = function() {
+      const katie = parseInt(document.getElementById('katiePoints').value || '0', 10);
+      const lucy = parseInt(document.getElementById('lucyPoints').value || '0', 10);
+      const jessica = parseInt(document.getElementById('jessicaPoints').value || '0', 10);
+
+      set(ref(db, "points"), {
+        katie: katie,
+        lucy: lucy,
+        jessica: jessica
+      }).then(() => {
+        alert("Points saved successfully!");
+      }).catch(error => {
+        alert("Error saving points: " + error);
+      });
+    };
+
+    // Load current points into the form when page opens
+    onValue(ref(db, "points"), snapshot => {
+      const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
+      document.getElementById('katiePoints').value = data.katie;
+      document.getElementById('lucyPoints').value = data.lucy;
+      document.getElementById('jessicaPoints').value = data.jessica;
+    });
+  </script>
 
   <style>
     body {
@@ -81,48 +123,5 @@
 
     <button onclick="savePoints()">Save Points</button>
   </div>
-
-  <script>
-    // --- Firebase setup ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
-      authDomain: "rewards-21619.firebaseapp.com",
-      projectId: "rewards-21619",
-      storageBucket: "rewards-21619.firebasestorage.app",
-      messagingSenderId: "712989986916",
-      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
-      measurementId: "G-TBG30TN6EW"
-    };
-
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // Save points to Firebase
-    function savePoints() {
-      const katie = parseInt(document.getElementById('katiePoints').value || '0', 10);
-      const lucy = parseInt(document.getElementById('lucyPoints').value || '0', 10);
-      const jessica = parseInt(document.getElementById('jessicaPoints').value || '0', 10);
-
-      db.ref("points").set({
-        katie: katie,
-        lucy: lucy,
-        jessica: jessica
-      })
-      .then(() => {
-        alert("Points saved successfully!");
-      })
-      .catch(error => {
-        alert("Error saving points: " + error);
-      });
-    }
-
-    // Load current points into the form when page opens
-    db.ref("points").on("value", snapshot => {
-      const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
-      document.getElementById('katiePoints').value = data.katie;
-      document.getElementById('lucyPoints').value = data.lucy;
-      document.getElementById('jessicaPoints').value = data.jessica;
-    });
-  </script>
 </body>
 </html>
