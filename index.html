@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Good Behaviour Points</title>
+  <title>Good Behaviour Points for Christmas</title>
+
+  <!-- Firebase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -11,6 +16,13 @@
       background-size: cover;
       color: white;
       text-align: center;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
     }
 
     .bar-container {
@@ -92,18 +104,11 @@
       position: absolute;
       top: -10px;
       left: -10px;
-      width: 50px;
-      height: 50px;
+      width: 170px;
+      height: 170px;
       pointer-events: none;
       z-index: 3;
     }
-    h1 {
-      font-size: 48px;   /* bigger headline */
-      font-weight: bold;
-      margin-top: 20px;
-      text-shadow: 3px 3px 6px rgba(0,0,0,0.6); /* optional glow for readability */
-    }
-
   </style>
 </head>
 <body>
@@ -141,26 +146,40 @@
   </div>
 
   <script>
+    // --- Firebase setup ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
+      authDomain: "rewards-21619.firebaseapp.com",
+      projectId: "rewards-21619",
+      storageBucket: "rewards-21619.firebasestorage.app",
+      messagingSenderId: "712989986916",
+      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
+      measurementId: "G-TBG30TN6EW"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     document.addEventListener('DOMContentLoaded', () => {
       updateBars();
     });
 
     function updateBars() {
-      const katie = parseInt(localStorage.getItem('katiePoints') || '0', 10);
-      const lucy = parseInt(localStorage.getItem('lucyPoints') || '0', 10);
-      const jessica = parseInt(localStorage.getItem('jessicaPoints') || '0', 10);
+      db.ref("points").on("value", snapshot => {
+        const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
 
-      animateBar('katieBar', katie);
-      animateBar('lucyBar', lucy);
-      animateBar('jessicaBar', jessica);
+        animateBar('katieBar', data.katie);
+        animateBar('lucyBar', data.lucy);
+        animateBar('jessicaBar', data.jessica);
 
-      updateStars('katieStars', katie);
-      updateStars('lucyStars', lucy);
-      updateStars('jessicaStars', jessica);
+        updateStars('katieStars', data.katie);
+        updateStars('lucyStars', data.lucy);
+        updateStars('jessicaStars', data.jessica);
 
-      updateWreath('katieWreath', katie);
-      updateWreath('lucyWreath', lucy);
-      updateWreath('jessicaWreath', jessica);
+        updateWreath('katieWreath', data.katie);
+        updateWreath('lucyWreath', data.lucy);
+        updateWreath('jessicaWreath', data.jessica);
+      });
     }
 
     function animateBar(barId, value) {
@@ -203,10 +222,10 @@
 
       if (points >= 50) {
         const wreathImg = document.createElement('img');
-        wreathImg.src = 'wreath.png'; // add a wreath image file
+        wreathImg.src = 'wreath.png'; // make sure wreath.png is in the same folder
         wreathImg.alt = 'Golden Wreath';
-        wreathImg.style.width = '50px';
-        wreathImg.style.height = '50px';
+        wreathImg.style.width = '170px';
+        wreathImg.style.height = '170px';
         container.appendChild(wreathImg);
       }
     }
