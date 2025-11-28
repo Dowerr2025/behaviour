@@ -190,15 +190,34 @@
       z-index: 3;
     }
 
-    <div class="snowflakes" aria-hidden="true">
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❅</div>
-  <div class="snowflake">❆</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❅</div>
-  <div class="snowflake">❆</div>
-</div>
+    .snowflakes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
 
+.snowflake {
+  position: absolute;
+  top: -10px;
+  color: white;
+  font-size: 1.5em;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
   </style>
 </head>
 <body>
@@ -233,7 +252,25 @@
       <div class="wreath" id="jessicaWreath"></div>
       <p>Jessica</p>
     </div>
+    <div class="snowflakes" aria-hidden="true">
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+</div>
+  <script>
+  const snowflakes = document.querySelectorAll('.snowflake');
+  snowflakes.forEach(flake => {
+    flake.style.left = Math.random() * window.innerWidth + 'px';
+    flake.style.animationDuration = (5 + Math.random() * 5) + 's';
+    flake.style.fontSize = (1 + Math.random() * 2) + 'em';
+  });
+</script>
+
   </div>
 </body>
 </html>
+
 
