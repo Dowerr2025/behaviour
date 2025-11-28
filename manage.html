@@ -80,16 +80,4 @@
 
     document.getElementById("update").addEventListener("click", async () => {
       const child = document.getElementById("child").value;
-      const points = parseInt(document.getElementById("points").value);
-      const reason = document.getElementById("reason").value;
-      const by = document.getElementById("by").value;
-
-      const note = {
-        reason,
-        by,
-        time: new Date().toLocaleString()
-      };
-
-      await updateDoc(doc(db, "points", child), {
-        points: points,
-       
+      const points
