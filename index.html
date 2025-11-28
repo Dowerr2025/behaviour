@@ -2,279 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Christmas Reward Points</title>
-
-  <!-- Firebase v9 modular scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-
-    // --- Firebase config with databaseURL added ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
-      authDomain: "rewards-21619.firebaseapp.com",
-      databaseURL: "https://rewards-21619-default-rtdb.firebaseio.com",  // <-- critical line
-      projectId: "rewards-21619",
-      storageBucket: "rewards-21619.firebasestorage.app",
-      messagingSenderId: "712989986916",
-      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
-      measurementId: "G-TBG30TN6EW"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // Listen for changes in points and update UI
-    onValue(ref(db, "points"), snapshot => {
-      const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
-
-      animateBar('katieBar', data.katie);
-      animateBar('lucyBar', data.lucy);
-      animateBar('jessicaBar', data.jessica);
-
-      updateStars('katieStars', data.katie);
-      updateStars('lucyStars', data.lucy);
-      updateStars('jessicaStars', data.jessica);
-
-      updateWreath('katieWreath', data.katie);
-      updateWreath('lucyWreath', data.lucy);
-      updateWreath('jessicaWreath', data.jessica);
-    });
-
-    // --- Functions ---
-    function animateBar(barId, value) {
-      const bar = document.getElementById(barId);
-      const targetWidth = Math.min(value * 20, 800);
-      const name = barId.replace('Bar','');
-
-      bar.textContent = name.charAt(0).toUpperCase() + name.slice(1) + ': ' + value;
-      bar.style.width = '0px';
-      setTimeout(() => { bar.style.width = targetWidth + 'px'; }, 80);
-    }
-
-    function updateStars(starContainerId, points) {
-      const container = document.getElementById(starContainerId);
-      if (!container) return;
-
-      container.innerHTML = '';
-      const starCount = Math.floor(points / 10);
-
-      for (let i = 0; i < starCount; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.textContent = '⭐';
-
-        const margin = 8;
-        const x = Math.random() * (150 - margin * 2) + margin;
-        const y = Math.random() * (150 - margin * 2) + margin;
-
-        star.style.left = x + 'px';
-        star.style.top = y + 'px';
-
-        container.appendChild(star);
-      }
-    }
-
-    function updateWreath(wreathId, points) {
-      const container = document.getElementById(wreathId);
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (points >= 50) {
-        const wreathImg = document.createElement('img');
-        wreathImg.src = 'wreath.png'; // make sure wreath.png is in the same folder
-        wreathImg.alt = 'Golden Wreath';
-        wreathImg.style.width = '170px';
-        wreathImg.style.height = '170px';
-        container.appendChild(wreathImg);
-      }
-    }
-  </script>
-
+  <title>Festive Points Dashboard</title>
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('children.jpg') no-repeat center center fixed;
-      background-size: cover;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom, #001f3f, #0074D9);
       color: white;
-      text-align: center;
+      overflow-x: hidden;
     }
 
     h1 {
-      font-size: 48px;
-      font-weight: bold;
+      text-align: center;
+      font-size: 2.5em;
       margin-top: 20px;
-      text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
     }
 
-    .bar-container {
-      width: 80%;
-      background: rgba(0, 0, 0, 0.35);
-      margin: 20px auto;
-      border-radius: 12px;
-      padding: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-    .bar {
-      height: 40px;
-      line-height: 40px;
-      text-align: left;
-      padding-left: 10px;
-      color: #fff;
-      font-weight: bold;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-      border-radius: 8px;
-      transition: width 0.8s ease-in-out;
-    }
-    .katie { background: #ff6f61; }
-    .lucy { background: #6fa8dc; }
-    .jessica { background: #93c47d; }
-
-    .trees {
+    .dashboard {
       display: flex;
       justify-content: center;
       gap: 40px;
-      margin: 50px 0;
-    }
-    .tree-container {
-      text-align: center;
-      position: relative;
-      width: 150px;
-    }
-    .tree {
-      width: 150px;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      z-index: 1;
-      position: relative;
-    }
-    .stars {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 150px;
-      height: 150px;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .star {
-      color: gold;
-      font-size: 24px;
-      position: absolute;
-      filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
-      opacity: 0;
-      transform: scale(0.6);
-      animation: pop 400ms ease forwards;
-    }
-    @keyframes pop {
-      to { opacity: 1; transform: scale(1); }
+      margin-top: 40px;
     }
 
-    .tree-container p {
-      font-size: 22px;
-      font-weight: bold;
-      margin-top: 10px;
-      color: #fff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    .child {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      width: 250px;
+      position: relative;
+    }
+
+    .points {
+      font-size: 2em;
+      margin: 10px 0;
+    }
+
+    .stars {
+      font-size: 1.5em;
+      color: gold;
     }
 
     .wreath {
-      position: absolute;
-      top: -10px;
-      left: -10px;
-      width: 170px;
-      height: 170px;
-      pointer-events: none;
-      z-index: 3;
+      font-size: 3em;
+      margin-top: 10px;
     }
 
+    /* Snowflakes */
     .snowflakes {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-  overflow: hidden;
-}
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-.snowflake {
-  position: absolute;
-  top: -10px;
-  color: white;
-  font-size: 1.5em;
-  animation: fall linear infinite;
-}
+    .snowflake {
+      position: absolute;
+      top: -10px;
+      color: white;
+      font-size: 1.5em;
+      animation: fall linear infinite;
+    }
 
-@keyframes fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
+    @keyframes fall {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0.8; }
+    }
+
+    /* Sticky notes */
+    .sticky-notes {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .note {
+      background: #fffa65;
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
-  <h1>Christmas Points</h1>
+  <h1>✨ Festive Points Dashboard ✨</h1>
 
-  <div class="bar-container">
-    <div class="bar katie" id="katieBar">Katie: 0</div>
-  </div>
-  <div class="bar-container">
-    <div class="bar lucy" id="lucyBar">Lucy: 0</div>
-  </div>
-  <div class="bar-container">
-    <div class="bar jessica" id="jessicaBar">Jessica: 0</div>
-  </div>
+  <div class="dashboard" id="dashboard"></div>
 
-  <div class="trees">
-    <div class="tree-container" id="katieTree">
-      <img src="tree.png" class="tree" alt="Christmas Tree">
-      <div class="stars" id="katieStars"></div>
-      <div class="wreath" id="katieWreath"></div>
-      <p>Katie</p>
-    </div>
-    <div class="tree-container" id="lucyTree">
-      <img src="tree.png" class="tree" alt="Christmas Tree">
-      <div class="stars" id="lucyStars"></div>
-      <div class="wreath" id="lucyWreath"></div>
-      <p>Lucy</p>
-    </div>
-    <div class="tree-container" id="jessicaTree">
-      <img src="tree.png" class="tree" alt="Christmas Tree">
-      <div class="stars" id="jessicaStars"></div>
-      <div class="wreath" id="jessicaWreath"></div>
-      <p>Jessica</p>
-    </div>
-    <div class="snowflakes" aria-hidden="true">
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❅</div>
-  <div class="snowflake">❆</div>
-  <div class="snowflake">❄</div>
-  <div class="snowflake">❅</div>
-  <div class="snowflake">❆</div>
-</div>
-  <script>
-  const snowflakes = document.querySelectorAll('.snowflake');
-  snowflakes.forEach(flake => {
-    flake.style.left = Math.random() * window.innerWidth + 'px';
-    flake.style.animationDuration = (5 + Math.random() * 5) + 's';
-    flake.style.fontSize = (1 + Math.random() * 2) + 'em';
-  });
-</script>
+  <!-- Snowflakes container -->
+  <div class="snowflakes" id="snowflakes"></div>
 
-  </div>
+  <script type="module">
+    // Firebase setup
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const kids = ["Katie", "Lucy", "Jessica"];
+    const dashboard = document.getElementById("dashboard");
+
+    kids.forEach(name => {
+      const childDiv = document.createElement("div");
+      childDiv.className = "child";
+      childDiv.id = name;
+
+      childDiv.innerHTML = `
+        <h2>${name}</h2>
+        <div class="points" id="${name}-points">0</div>
+        <div class="stars" id="${name}-stars"></div>
+        <div class="wreath" id="${name}-wreath"></div>
+        <div class="sticky-notes" id="${name}-notes"></div>
+      `;
+      dashboard.appendChild(childDiv);
+
+      // Live Firestore listener
+      onSnapshot(doc(db, "points", name), (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          document.getElementById(`${name}-points`).textContent = data.points;
+
+          // Stars
+          document.getElementById(`${name}-stars`).textContent = "⭐".repeat(Math.floor(data.points / 5));
+
+          // Wreath milestone
+          document.getElementById(`${name}-wreath`).textContent = data.points >= 20 ? "🎄" : "";
+
+          // Sticky notes
+          const notesDiv = document.getElementById(`${name}-notes`);
+          notesDiv.innerHTML = "";
+          if (data.notes) {
+            data.notes.forEach(note => {
+              const noteDiv = document.createElement("div");
+              noteDiv.className = "note";
+              noteDiv.textContent = `${note.reason} — ${note.by} (${note.time})`;
+              notesDiv.appendChild(noteDiv);
+            });
+          }
+        }
+      });
+    });
+
+    // Snowflake generator
+    function createSnowflake() {
+      const snowflake = document.createElement("div");
+      snowflake.className = "snowflake";
+      snowflake.textContent = "❄";
+      snowflake.style.left = Math.random() * window.innerWidth + "px";
+      snowflake.style.animationDuration = (5 + Math.random() * 5) + "s";
+      document.getElementById("snowflakes").appendChild(snowflake);
+
+      setTimeout(() => snowflake.remove(), 10000);
+    }
+    setInterval(createSnowflake, 300);
+  </script>
 </body>
 </html>
-
-
-
-
-
