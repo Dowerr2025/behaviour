@@ -2,158 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Manage Points (Secure)</title>
-
-  <!-- Firebase v9 modular scripts -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-    // --- Firebase config ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyDgoL18X1QLx1M6N3DsSuZkKcdFMT2KE1Y",
-      authDomain: "rewards-21619.firebaseapp.com",
-      databaseURL: "https://rewards-21619-default-rtdb.firebaseio.com",
-      projectId: "rewards-21619",
-      storageBucket: "rewards-21619.firebasestorage.app",
-      messagingSenderId: "712989986916",
-      appId: "1:712989986916:web:d7bd2ce4478a8a20eb8f71",
-      measurementId: "G-TBG30TN6EW"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    let loggedIn = false;
-
-    // Handle login
-    window.login = function() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          loggedIn = true;
-          alert("Logged in successfully!");
-          document.getElementById('loginForm').style.display = 'none';
-          document.getElementById('pointsForm').style.display = 'block';
-        })
-        .catch(error => {
-          alert("Login failed: " + error.message);
-        });
-    };
-
-    // Save points (only if logged in)
-    window.savePoints = function() {
-      if (!loggedIn) {
-        alert("You must log in first!");
-        return;
-      }
-
-      const katie = parseInt(document.getElementById('katiePoints').value || '0', 10);
-      const lucy = parseInt(document.getElementById('lucyPoints').value || '0', 10);
-      const jessica = parseInt(document.getElementById('jessicaPoints').value || '0', 10);
-
-      set(ref(db, "points"), { katie, lucy, jessica })
-        .then(() => alert("Points saved securely!"))
-        .catch(error => alert("Error saving points: " + error));
-    };
-
-    // Load current points into the form
-    onValue(ref(db, "points"), snapshot => {
-      const data = snapshot.val() || {katie:0, lucy:0, jessica:0};
-      document.getElementById('katiePoints').value = data.katie;
-      document.getElementById('lucyPoints').value = data.lucy;
-      document.getElementById('jessicaPoints').value = data.jessica;
-    });
-  </script>
-
+  <title>Manage Points</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: url('children.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      text-align: center;
-      margin: 0;
+      background: #f0f0f0;
       padding: 20px;
     }
-
-    h1 {
-      font-size: 40px;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
-    }
-
-    .form-container {
-      background: rgba(0,0,0,0.5);
+    h1 { text-align: center; }
+    .form-section {
+      background: white;
       padding: 20px;
-      border-radius: 12px;
-      width: 300px;
-      margin: 40px auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+      margin: 20px auto;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
-
-    label {
-      display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-    }
-
-    input {
+    label { display: block; margin-top: 10px; }
+    input, select, textarea {
       width: 100%;
       padding: 8px;
-      border-radius: 6px;
-      border: none;
-      text-align: center;
-      font-size: 18px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
-
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background: #0074D9;
+      color: white;
       border: none;
-      border-radius: 8px;
-      background: #ffcc00;
-      color: #000;
-      font-weight: bold;
+      border-radius: 5px;
       cursor: pointer;
-      transition: background 0.3s;
     }
-
-    button:hover {
-      background: #ffdb4d;
-    }
+    button:hover { background: #005fa3; }
   </style>
 </head>
 <body>
-  <h1>Manage Points (Secure)</h1>
+  <h1>🎁 Manage Points & Rewards</h1>
 
-  <!-- Login form -->
-  <div id="loginForm" class="form-container">
-    <label for="email">Email:</label>
-    <input type="text" id="email">
+  <div class="form-section">
+    <label for="child">Select Child:</label>
+    <select id="child">
+      <option value="Katie">Katie</option>
+      <option value="Lucy">Lucy</option>
+      <option value="Jessica">Jessica</option>
+    </select>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password">
+    <label for="points">Points:</label>
+    <input type="number" id="points" placeholder="Enter points">
 
-    <button onclick="login()">Login</button>
+    <label for="reason">Reward Reason:</label>
+    <textarea id="reason" placeholder="Enter reason"></textarea>
+
+    <label for="by">Given By:</label>
+    <input type="text" id="by" placeholder="Parent/Guardian">
+
+    <button id="update">Update</button>
   </div>
 
-  <!-- Points form (hidden until login) -->
-  <div id="pointsForm" class="form-container" style="display:none;">
-    <label for="katiePoints">Katie's Points:</label>
-    <input type="number" id="katiePoints" min="0">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    <label for="lucyPoints">Lucy's Points:</label>
-    <input type="number" id="lucyPoints" min="0">
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-    <label for="jessicaPoints">Jessica's Points:</label>
-    <input type="number" id="jessicaPoints" min="0">
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    <button onclick="savePoints()">Save Points</button>
-  </div>
-</body>
-</html>
+    document.getElementById("update").addEventListener("click", async () => {
+      const child = document.getElementById("child").value;
+      const points = parseInt(document.getElementById("points").value);
+      const reason = document.getElementById("reason").value;
+      const by = document.getElementById("by").value;
+
+      const note = {
+        reason,
+        by,
+        time: new Date().toLocaleString()
+      };
+
+      await updateDoc(doc(db, "points", child), {
+        points: points,
+       
